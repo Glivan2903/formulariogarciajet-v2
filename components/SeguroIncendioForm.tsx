@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Step1_Corretora } from "./steps/Step1_Corretora";
 import { Step2_Situacao } from "./steps/Step2_Situacao";
@@ -40,6 +41,12 @@ export default function SeguroIncendioForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [resultadoEnvio, setResultadoEnvio] = useState<{
+    canal: "email" | "webhook";
+    quotationCode: string;
+    nomeCorretora: string;
+    nomeProponente: string;
+  } | null>(null);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -145,6 +152,12 @@ export default function SeguroIncendioForm() {
         );
       }
 
+      setResultadoEnvio({
+        canal: result.canal,
+        quotationCode: result.quotationCode,
+        nomeCorretora: data.nomeCorretora,
+        nomeProponente: data.nomeProponente,
+      });
       setIsCompleted(true);
 
       if (result.canal === "webhook") {
@@ -154,6 +167,16 @@ export default function SeguroIncendioForm() {
             : "O envio por e-mail falhou, mas o pedido foi registrado.",
           duration: 12000,
         });
+
+        // O e-mail (com os anexos) não saiu, então os documentos precisam ir
+        // manualmente pelo WhatsApp — abrimos já no clique do utilizador para
+        // não ser bloqueado como pop-up.
+        const whatsappNumber = "554330280500";
+        const message = `Segue o pedido NÚMERO *${result.quotationCode}* de cotação DO SEGURO DE INCÊNDIO da Corretora *${data.nomeCorretora}*, proponente *${data.nomeProponente}* e Documentos, fotos, cópia de apólices da concorrência a seguir.`;
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+          message
+        )}`;
+        window.open(whatsappUrl, "_blank");
       } else {
         toast.success("Formulário enviado com sucesso!");
 
@@ -166,15 +189,6 @@ export default function SeguroIncendioForm() {
           });
         }
       }
-
-      const whatsappNumber = "554330280500";
-      const message = `Segue o pedido NÚMERO *${result.quotationCode}* de cotação DO SEGURO DE INCÊNDIO da Corretora *${data.nomeCorretora}*, proponente *${data.nomeProponente}* e Documentos, fotos, cópia de apólices da concorrência a seguir.`;
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-        message
-      )}`;
-
-      // Aberto no mesmo clique do utilizador para não ser bloqueado como pop-up.
-      window.open(whatsappUrl, "_blank");
     } catch (error) {
       console.error("[Formulário Envio] Erro:", error);
       toast.error("Erro ao enviar formulário", {
@@ -188,13 +202,18 @@ export default function SeguroIncendioForm() {
     }
   };
 
-  if (isCompleted) {
+  if (isCompleted && resultadoEnvio) {
     return (
       <SuccessScreen
+        canal={resultadoEnvio.canal}
+        quotationCode={resultadoEnvio.quotationCode}
+        nomeCorretora={resultadoEnvio.nomeCorretora}
+        nomeProponente={resultadoEnvio.nomeProponente}
         onNovaCotacao={() => {
           methods.reset();
           setCurrentStep(0);
           setIsCompleted(false);
+          setResultadoEnvio(null);
         }}
       />
     );
@@ -267,11 +286,16 @@ export default function SeguroIncendioForm() {
                     }
                     disabled={isSubmitting}
                   >
-                    {isSubmitting
-                      ? "Enviando..."
-                      : currentStep === steps.length - 1
-                      ? "Finalizar e Enviar"
-                      : "Próximo"}
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Enviando...
+                      </span>
+                    ) : currentStep === steps.length - 1 ? (
+                      "Finalizar e Enviar"
+                    ) : (
+                      "Próximo"
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -279,6 +303,25 @@ export default function SeguroIncendioForm() {
           </form>
         </FormProvider>
       </div>
+
+      {isSubmitting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full text-center space-y-4">
+            <Loader2 className="h-10 w-10 animate-spin text-blue-600 mx-auto" />
+            <div>
+              <p className="font-semibold text-gray-900">
+                Enviando seu pedido de cotação...
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {(methods.watch("anexos")?.length ?? 0) > 0
+                  ? "Anexando os documentos, isso pode levar alguns segundos."
+                  : "Isto pode levar alguns segundos."}
+                {" "}Aguarde, não feche nem atualize esta página.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
