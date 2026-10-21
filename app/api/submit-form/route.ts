@@ -42,7 +42,10 @@ const FIELDS_BY_STEP = {
       possuiuSeguroAnterior: "Possuiu seguro anteriormente?",
       motivoSemSeguro: "Motivo de estar sem seguro até a presente data",
       localEmOperacao: "O local está em operação/atividade?",
-      condominioLogistico: "Local fica dentro de condomínio logístico/empresarial e divide o prédio com outras empresas?",
+      cotacaoOutraCia: "Possui cotação de outra Cia? Se sim, quais Cias?",
+      premioProvavel: "Qual valor de prêmio provável para fechamento?",
+      condominioLogistico: "Local fica dentro de condomínio logístico/empresarial?",
+      divideComOutrasEmpresas: "Divide o prédio com outras empresas que não têm relação com o segurado?",
     },
   },
   Etapa3: {
@@ -66,7 +69,8 @@ const FIELDS_BY_STEP = {
       atividadeComercialSelecionada: "Selecione a Atividade de Comércio e Serviços",
       atividadeComercial: "Descreva a mercadoria comercializada e se tem depósito no local",
       classeConstrucao: "Escolha SOMENTE UMA das classes de construção abaixo",
-      tipoIsopainel: "Tipo de Isopainel do Local",
+      localIsopainel: "Local do Isopainel",
+      tipoIsopainel: "Tipo de Isopainel do Local e Porcentagem de Isopainel",
     },
   },
   Etapa5: {
@@ -224,8 +228,12 @@ function organizeDataBySteps(data: Record<string, any>): Record<string, any> {
     for (const [fieldKey, fieldLabel] of Object.entries(stepConfig.fields)) {
       const value = data[fieldKey]
 
-      if (value === undefined || value === "") {
+      if (value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) {
         stepData[fieldLabel] = null
+      } else if (Array.isArray(value)) {
+        stepData[fieldLabel] = value
+          .map((item) => String(item).charAt(0).toUpperCase() + String(item).slice(1))
+          .join(", ")
       } else {
         stepData[fieldLabel] = value
       }

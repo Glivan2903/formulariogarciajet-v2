@@ -86,6 +86,8 @@ const ehPeriodoIndenitario = (label: string): boolean =>
 const montarLinha = (label: string, valor: unknown, etapa: string): string => {
   if (valor === null || valor === undefined || valor === "") return "";
   if (valor === 0 || valor === "0") return "";
+  // Protecionais: só entram no e-mail os que foram marcados.
+  if (etapa === "Etapa5" && valor === "nao") return "";
 
   let valorFormatado: string;
 
@@ -95,7 +97,7 @@ const montarLinha = (label: string, valor: unknown, etapa: string): string => {
     valorFormatado = `${valor} ${Number(valor) === 1 ? "mês" : "meses"}`;
   } else if (typeof valor === "string" && ROTULOS_DE_VALOR[valor]) {
     valorFormatado = ROTULOS_DE_VALOR[valor];
-  } else if ((etapa === "Etapa6" || etapa === "Etapa7") && ehNumerico(valor)) {
+  } else if ((etapa === "Etapa6" || etapa === "Etapa7" || /pr[êe]mio prov[áa]vel/i.test(label)) && ehNumerico(valor)) {
     valorFormatado = formatarMoeda(valor);
   } else {
     valorFormatado = String(valor);

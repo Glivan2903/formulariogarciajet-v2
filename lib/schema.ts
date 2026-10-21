@@ -82,7 +82,18 @@ export const step2SchemaBase = z.object({
   possuiuSeguroAnterior: z.string().max(500, "Resposta muito longa.").optional(),
   motivoSemSeguro: z.string().max(1000, "Resposta muito longa.").optional(),
   localEmOperacao: z.string().max(500, "Resposta muito longa.").optional(),
-  condominioLogistico: z.string().max(1000, "Resposta muito longa.").optional(),
+  condominioLogistico: z.enum(["sim", "nao"], {
+    required_error: "Informe se o local fica dentro de condomínio logístico/empresarial.",
+    invalid_type_error: "Selecione uma opção válida.",
+  }),
+  divideComOutrasEmpresas: z.enum(["sim", "nao"], {
+    required_error: "Informe se o prédio é dividido com outras empresas.",
+    invalid_type_error: "Selecione uma opção válida.",
+  }),
+
+  // Cotação em outra seguradora
+  cotacaoOutraCia: z.string().max(500, "Resposta muito longa.").optional(),
+  premioProvavel: z.coerce.number().optional(),
 });
 
 export const step3Schema = z.object({
@@ -155,9 +166,10 @@ export const step4SchemaBase = z.object({
   classeConstrucao: z.string({
     required_error: "Selecione a classe de construção.",
   }),
+  localIsopainel: z.array(z.enum(["telhado", "paredes"])).optional(),
   tipoIsopainel: z
     .string()
-    .max(100, "Descrição muito longa.") // <-- ALTERAÇÃO
+    .max(255, "Descrição muito longa.") // <-- ALTERAÇÃO
     .optional(),
 });
 

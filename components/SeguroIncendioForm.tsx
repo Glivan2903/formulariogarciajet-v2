@@ -87,7 +87,20 @@ export default function SeguroIncendioForm() {
     // Assegura que currentSchema é um ZodObject
     if (currentSchema && "shape" in currentSchema) {
       const fields = Object.keys(currentSchema.shape) as (keyof FormValues)[];
-      const isValid = await methods.trigger(fields, { shouldFocus: true });
+      let isValid = await methods.trigger(fields, { shouldFocus: true });
+
+      // Etapa 4: com isopainel, é obrigatório indicar onde ele está (telhado e/ou paredes).
+      if (currentStep === 3) {
+        const classe = methods.getValues("classeConstrucao");
+        const locais = methods.getValues("localIsopainel") ?? [];
+        if (classe?.startsWith("isopainel") && locais.length === 0) {
+          methods.setError("localIsopainel", {
+            type: "manual",
+            message: "Selecione ao menos uma opção: Telhado e/ou Paredes.",
+          });
+          isValid = false;
+        }
+      }
 
       if (currentStep === 0 && methods.getValues("orgaoPublico") === "sim") {
         toast.error("Não é possível prosseguir.", {

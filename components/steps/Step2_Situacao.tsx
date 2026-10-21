@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CurrencyInput } from "@/components/CurrencyInput";
 import {
   SITUACAO_SEGURO_OPTIONS,
   SITUACAO_SINISTRO_OPTIONS,
@@ -24,6 +26,11 @@ export const Step2_Situacao = () => {
 
   return (
     <div className="space-y-6">
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-900">
+        Esse questionário você pode preenchê-lo pelo Notebook, Tablet ou até pelo
+        celular, porém quanto mais informações, mais poderemos precificar o risco
+        ou até a vistoria poderá ser digital.
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>📋 Situação do Seguro</CardTitle>
@@ -110,6 +117,25 @@ export const Step2_Situacao = () => {
               )}
             />
           )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name="cotacaoOutraCia"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Possui cotação de outra Cia? Se sim, quais Cias?</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex.: Sim, Porto Seguro e Tokio Marine" {...field} value={field.value ?? ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <CurrencyInput
+              name="premioProvavel"
+              label="Qual valor de prêmio provável para fechamento?"
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -121,6 +147,42 @@ export const Step2_Situacao = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {([
+            { name: "condominioLogistico", label: "Local fica dentro de condomínio logístico/empresarial? *" },
+            { name: "divideComOutrasEmpresas", label: "Divide o prédio com outras empresas que não têm relação com o segurado? *" },
+          ] as const).map((pergunta) => (
+            <FormField
+              key={pergunta.name}
+              control={control}
+              name={pergunta.name}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{pergunta.label}</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      className="flex space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="sim" />
+                        </FormControl>
+                        <FormLabel>Sim</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="nao" />
+                        </FormControl>
+                        <FormLabel>Não</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
           {QUESTOES_ADICIONAIS_SEGURO.map((questao) => (
             <FormField
               key={questao.key}

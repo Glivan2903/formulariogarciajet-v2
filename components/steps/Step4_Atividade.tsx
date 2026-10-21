@@ -21,7 +21,9 @@ import {
   ATIVIDADES_INDUSTRIAIS,
   ATIVIDADES_COMERCIAIS,
   CLASSE_CONSTRUCAO_OPTIONS,
+  LOCAL_ISOPAINEL_OPTIONS,
 } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormValues } from "@/lib/schema";
 import { Input } from "../ui/input";
 
@@ -38,6 +40,14 @@ export const Step4_Atividade = () => {
 
   const tipoAtividade = watch("tipoAtividade");
   const classeConstrucao = watch("classeConstrucao");
+
+  // Sem isopainel, descarta as respostas específicas dele
+  useEffect(() => {
+    if (!classeConstrucao?.startsWith("isopainel")) {
+      setValue("localIsopainel", []);
+      setValue("tipoIsopainel", "");
+    }
+  }, [classeConstrucao, setValue]);
 
   // Re-trigger validation when tipoAtividade muda (as regras condicionais dependem disso)
   useEffect(() => {
@@ -300,22 +310,59 @@ export const Step4_Atividade = () => {
 
           {(classeConstrucao === "isopainel-25" ||
             classeConstrucao === "isopainel-mais-25") && (
-            <FormField
-              control={control}
-              name="tipoIsopainel"
-              render={({ field }) => (
-                <FormItem className="p-4 bg-yellow-50 rounded-lg">
-                  <FormLabel>Tipo de Isopainel do Local</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Descreva o tipo de isopainel"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-4">
+              <FormField
+                control={control}
+                name="localIsopainel"
+                render={({ field }) => {
+                  const selecionados = field.value ?? [];
+                  return (
+                    <FormItem className="p-4 bg-yellow-50 rounded-lg">
+                      <FormLabel>Onde há isopainel no local? *</FormLabel>
+                      <div className="flex space-x-6">
+                        {LOCAL_ISOPAINEL_OPTIONS.map((opcao) => (
+                          <label key={opcao.value} className="flex items-center space-x-2 text-sm cursor-pointer">
+                            <Checkbox
+                              checked={selecionados.includes(opcao.value)}
+                              onCheckedChange={(checked) =>
+                                field.onChange(
+                                  checked
+                                    ? [...selecionados, opcao.value]
+                                    : selecionados.filter((v) => v !== opcao.value)
+                                )
+                              }
+                            />
+                            <span>{opcao.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+              <FormField
+                control={control}
+                name="tipoIsopainel"
+                render={({ field }) => (
+                  <FormItem className="p-4 bg-yellow-50 rounded-lg">
+                    <FormLabel>
+                      {classeConstrucao === "isopainel-mais-25"
+                        ? "Tipo de Isopainel do Local e Porcentagem de Isopainel"
+                        : "Tipo de Isopainel do Local"}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Descreva o tipo de isopainel"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           )}
         </CardContent>
       </Card>

@@ -835,18 +835,22 @@ export const CLASSE_CONSTRUCAO_OPTIONS = [
     { value: "isopainel-mais-25", label: "Isopainel com mais de 25% da área" },
 ];
 
+export const LOCAL_ISOPAINEL_OPTIONS = [
+    { value: "telhado", label: "Telhado" },
+    { value: "paredes", label: "Paredes" },
+] as const;
+
 export const QUESTOES_ADICIONAIS_SEGURO = [
     { key: "clausulaBeneficiaria", label: "Será necessária a inclusão de cláusula beneficiária?", placeholder: "Ex.: Sim - Banco XPTO S.A." },
     { key: "sinistralidade5Anos", label: "Sinistralidade dos últimos 5 anos:", placeholder: "Ex.: Nenhum sinistro registrado" },
     { key: "possuiuSeguroAnterior", label: "Possuiu seguro anteriormente?", placeholder: "Ex.: Sim, até 03/2025 na Seguradora XPTO" },
     { key: "motivoSemSeguro", label: "Informar o motivo do mesmo estar sem seguro até a presente data:", placeholder: "Ex.: Apólice vencida e não renovada" },
     { key: "localEmOperacao", label: "O local está em operação/atividade?", placeholder: "Ex.: Sim, em operação normal" },
-    { key: "condominioLogistico", label: "Local fica dentro de condomínio logístico/empresarial e se divide o prédio com outras empresas?", placeholder: "Ex.: Sim, condomínio logístico, prédio dividido com 3 empresas" },
 ] as const;
 
-// Limite total dos anexos da Etapa 8. Em produção (Vercel) o corpo da requisição
-// é limitado a ~4,5 MB, por isso o padrão conservador.
-export const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_MB || 4);
+// Limite total dos anexos da Etapa 8. Atenção: na Vercel o corpo da requisição
+// é limitado a ~4,5 MB, então acima disso o envio exige upload direto para storage.
+export const MAX_UPLOAD_MB = Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_MB || 10);
 
 export const TIPOS_ANEXO_ACEITOS =
     ".pdf,.jpg,.jpeg,.png,.webp,.heic,.doc,.docx,.xls,.xlsx,.csv,.txt";
