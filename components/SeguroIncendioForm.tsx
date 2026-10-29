@@ -237,8 +237,14 @@ export default function SeguroIncendioForm() {
       <div className="max-w-4xl mx-auto">
         <Card className="mb-6">
           <CardHeader className="text-center">
+            <img
+              src="/logo-exclusiva.png"
+              alt="Exclusiva"
+              className="mx-auto mb-2 h-28 w-auto"
+            />
             <CardTitle className="text-3xl font-bold text-gray-900">
-              Questionário para Cotação de Seguro Incêndio
+              Questionário para Cotação de Seguro de Incêndio da Exclusiva e
+              Seguradoras Parceiras
             </CardTitle>
             <CardDescription className="text-lg">
               Vamos dar início ao processo de cotação do seguro e para isso as
