@@ -234,6 +234,11 @@ export default function SeguroIncendioForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 p-4">
+      {/* Marca d'água discreta: fixa ao centro, quase transparente e sem capturar cliques */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-40 bg-[url('/logo-exclusiva.png')] bg-center bg-no-repeat bg-[length:min(70vw,520px)] opacity-[0.06]"
+      />
       <div className="max-w-4xl mx-auto">
         <Card className="mb-6">
           <CardHeader className="text-center">
@@ -243,8 +248,8 @@ export default function SeguroIncendioForm() {
               className="mx-auto mb-2 h-28 w-auto"
             />
             <CardTitle className="text-3xl font-bold text-gray-900">
-              Questionário para Cotação de Seguro de Incêndio da Exclusiva e
-              Seguradoras Parceiras
+              Questionário para Cotação de Seguro de Incêndio da EXCLUSIVA
+              ASSESSORIA e Seguradoras Parceiras
             </CardTitle>
             <CardDescription className="text-lg">
               Vamos dar início ao processo de cotação do seguro e para isso as
@@ -321,6 +326,11 @@ export default function SeguroIncendioForm() {
             </Card>
           </form>
         </FormProvider>
+
+        <footer className="mt-6 pb-2 text-center text-[11px] leading-tight text-gray-500">
+          © Direitos autorais de Exclusiva Assessoria e Representação Comercial
+          Ltda - CNPJ 07.238.258/0001-70
+        </footer>
       </div>
 
       {isSubmitting && (
